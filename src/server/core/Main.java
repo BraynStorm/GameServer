@@ -3,8 +3,8 @@ package server.core;
 import java.net.URISyntaxException;
 
 public class Main {
-	private String mainDir;
-	private String dataDir;
+	private static String mainDir = "";
+	private static String dataDir = "";
 	
 	/** Impossible to throw that {@link URISyntaxException} but still.... */
 	private Main(){
@@ -21,8 +21,8 @@ public class Main {
 	
 	
 	// Getters
-	public String getMainDir(){ return mainDir; }
-	public String getDataDir(){ return dataDir; }
+	public static String getMainDir(){ return mainDir; }
+	public static String getDataDir(){ return dataDir; }
 	
 	// Singleton
 	private static Main instance;

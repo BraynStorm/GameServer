@@ -33,7 +33,7 @@ public class Config {
 		strings = new HashMap<String, String>();
 		
 		try{
-			BufferedReader reader = new BufferedReader(new FileReader(Main.getInstance().getMainDir()));
+			BufferedReader reader = new BufferedReader(new FileReader(Main.getMainDir()));
 			StringBuilder stringBuilder = new StringBuilder();
 			
 			while(reader.ready())
