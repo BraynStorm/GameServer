@@ -122,12 +122,9 @@ public class Config {
 	public void setValueS(String key, String value){ String val = strings.put(key, value); wasConfigChanged = !val.equals(value); }
 	
 	// TODO Create the resetValue methods.
-	/** NYI */
-	public void resetValuei(String key){}
-	/** NYI */
-	public void resetValuef(String key){}
-	/** NYI */
-	public void resetValueS(String key){}
+	public void resetValuei(String key){ setValuei(key, defaultIntegers.get(key)); }
+	public void resetValuef(String key){ setValuef(key, defaultFloats.get(key)); }
+	public void resetValueS(String key){ setValueS(key, defaultStrings.get(key)); }
 	
 	// Singleton
 	private static Config instance;

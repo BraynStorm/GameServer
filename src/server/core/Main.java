@@ -10,7 +10,7 @@ public class Main {
 	private Main(){
 		
 		try {
-			mainDir = Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().toString().substring(6);
+			mainDir = Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().toString().substring(6); // StackOverflow :)
 			dataDir = mainDir + "data/";
 		} catch (URISyntaxException e) { /* Impossible */ e.printStackTrace(); }
 		
@@ -19,9 +19,10 @@ public class Main {
 	}
 	
 	
-	public String getMainDir(){
-		return mainDir;
-	}
+	
+	// Getters
+	public String getMainDir(){ return mainDir; }
+	public String getDataDir(){ return dataDir; }
 	
 	// Singleton
 	private static Main instance;
