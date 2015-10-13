@@ -55,7 +55,7 @@ public class Config {
 		it.forEachRemaining(key -> {
 			JSONObject innerObj = jsonObj.getJSONObject(key);
 			Iterator<String> innerIt = innerObj.keys();
-			switch(key){
+			switch(key.toLowerCase()){
 				case "i":
 					innerIt.forEachRemaining(integerKey -> integers.put(integerKey, innerObj.getInt(integerKey)) );
 					break;
@@ -65,6 +65,8 @@ public class Config {
 				case "s":
 					innerIt.forEachRemaining(stringKey -> strings.put(stringKey, innerObj.getString(stringKey)) );
 					break;
+				default:
+					System.out.println("Unknown config key. Skipping");
 			}
 			
 		});
