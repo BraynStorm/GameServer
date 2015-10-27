@@ -6,6 +6,9 @@ public class Main {
 	private static String mainDir = "";
 	private static String dataDir = "";
 	
+	private static ClientAcceptor clientAcceptor;
+	private static Thread clientAcceptorThread;
+	
 	/** Impossible to throw that {@link URISyntaxException} but still.... */
 	private Main(){
 		
@@ -16,6 +19,13 @@ public class Main {
 		
 		// Load Config;
 		Config.getInstance();
+		
+		
+		// Start accepting clients.
+		clientAcceptor = new ClientAcceptor();
+		clientAcceptorThread = new Thread(clientAcceptor);
+		clientAcceptorThread.setName("ClientAcceptor");
+		clientAcceptorThread.start();
 	}
 	
 	

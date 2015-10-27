@@ -17,7 +17,7 @@ public class ClientAcceptor implements Runnable {
 	public ClientAcceptor() {
 		clients = new HashSet<>();
 		try {
-			serverSocket = new ServerSocket(33055);
+			serverSocket = new ServerSocket(Config.getInstance().getValuei("serverPort"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {

@@ -7,7 +7,7 @@ import java.net.Socket;
  * @author BraynStorm
  * 
  */
-public class Client {
+public class Client implements Runnable{
 	private Socket socket;
 	private int accountID;
 	
@@ -18,6 +18,21 @@ public class Client {
 	public boolean isLogged(){
 		return accountID == 0;
 	}
+	
+	public int getAccountID(){
+	    return accountID;
+	}
+
+    @Override
+    public void run() {
+        if(socket == null){
+            return;
+        }
+        
+        while ( !socket.isClosed() ){
+            
+        }
+    }
 	
 	
 	

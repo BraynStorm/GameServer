@@ -73,8 +73,7 @@ public class Config {
 	}
 	
 	private void initDefaults(){
-		//TODO Initialize the default value for the whole conifg.
-		
+		defaultIntegers.put("serverPort", 33055);
 	}
 	
 	/**
