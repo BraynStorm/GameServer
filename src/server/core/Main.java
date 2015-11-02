@@ -1,34 +1,44 @@
 package server.core;
 
+
+import java.io.File;
 import java.net.URISyntaxException;
 
+import braynstorm.commonlib.Logger;
+import server.network.Server;
 public class Main {
 	private static String mainDir = "";
 	private static String dataDir = "";
 	
-	private static ClientAcceptor clientAcceptor;
-	private static Thread clientAcceptorThread;
+	private Thread serverThread;
+	private Server server;
 	
-	/** Impossible to throw that {@link URISyntaxException} but still.... */
 	private Main(){
 		
 		try {
 			mainDir = Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().toString().substring(6); // StackOverflow :)
 			dataDir = mainDir + "data/";
+			
+			File dataDirDir = new File(dataDir);
+			if(!dataDirDir.isDirectory()){
+			    dataDirDir.mkdir();
+			}
+			
 		} catch (URISyntaxException e) { /* Impossible */ e.printStackTrace(); }
 		
-		// Load Config;
-		Config.getInstance();
+		Logger.init(mainDir);
+		Config.init();
 		
 		
-		// Start accepting clients.
-		clientAcceptor = new ClientAcceptor();
-		clientAcceptorThread = new Thread(clientAcceptor);
-		clientAcceptorThread.setName("ClientAcceptor");
-		clientAcceptorThread.start();
+		server = new Server();
+		serverThread = new Thread(server);
+		serverThread.setName("Networking");
+		serverThread.run();
 	}
 	
-	
+	public static Server getServer(){
+	    return getInstance().server;
+	}
 	
 	// Getters
 	public static String getMainDir(){ return mainDir; }

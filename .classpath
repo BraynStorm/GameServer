@@ -2,6 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Guava"/>
 	<classpathentry kind="lib" path="E:/Development/Workspace-New/Enjine/lib/JSON.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/CommonLib"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
