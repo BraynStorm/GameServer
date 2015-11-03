@@ -11,7 +11,9 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -23,8 +25,10 @@ public class Server implements Runnable {
     private ServerSocketChannel serverChannel;
     private Selector selector;
     
-    private Map<SocketChannel, Queue<Packet>> toWriteData = new ConcurrentHashMap<>();
-    private Map<SocketChannel, Deque<Byte>> readData = new ConcurrentHashMap<>();
+    @Deprecated private Map<SocketChannel, Queue<Packet>> toWriteData = new ConcurrentHashMap<>();
+    @Deprecated private Map<SocketChannel, Deque<Byte>> readData = new ConcurrentHashMap<>();
+    
+    private Set<Client> clients = new ConcurrentSkipListSet<>();
     
     private ByteBuffer tempReadBuffer = ByteBuffer.allocate(1024);
     private ByteBuffer headReader = ByteBuffer.allocate(Packet.HEADER_SIZE);

@@ -1,7 +1,14 @@
 package server.game;
 
+import server.game.entities.EntityLiving;
+
 public class BaseStats {
+    private EntityLiving entity;
     
+    public BaseStats(EntityLiving entity) {
+        this.entity = entity;
+    }
+
     /**
      * PhysicalPower +=         str * 1.00f.<br>
      * Armor +=                 str * 5.50f.<br>

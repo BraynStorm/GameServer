@@ -6,21 +6,25 @@ import java.util.Map;
 import server.game.entities.EntityLiving;
 
 public class CalculatableStats {
+    private EntityLiving entity;
+    
+    public CalculatableStats(EntityLiving entity) {
+        this.entity = entity;
+    }
+
     /*
      * Flat additive amplifiers.
      */
     
-    public float physicalPower;
-    public float spellDamagePower;
-    public float spellHealPower;
+    //public float physicalPower;
+    //public float spellDamagePower;
+    //public float spellHealPower;
     
-    public float chanceToMissPhysical;
-    public float chanceToMissMagical;
+    //public float chanceToMissPhysical;
+    //public float chanceToMissMagical;
     
-    public float chanceToCritPhysical;
-    public float chanceToCritMagical;
-    
-    public float movementSpeed; // obvious
+    //public float chanceToCritPhysical;
+    //public float chanceToCritMagical;
     
     /*
      * Flat damage reductions. (aka dmg - reduction)
@@ -28,21 +32,23 @@ public class CalculatableStats {
     public Map<String, Float> allStats;
     public Map<DamageType, Float> flatReductions;
     
-    public float percentDamageReduction; // Auras only
-    public float percentPhysicalDamageReduction; // auras only
-    public float percentMagicalDamageReduction; // auras only
+    //public float percentDamageReduction; // Auras only
+    //public float percentPhysicalDamageReduction; // auras only
+    //public float percentMagicalDamageReduction; // auras only
     
     public CalculatableStats() {
         flatReductions = new HashMap<DamageType, Float>();
     }
     
-    public void recalcAll(EntityLiving entity){
+    public void recalcAll(){
         //TODO recalculate all the stats, +checking for stats-increasing auras, and passive spells. (?)
         BaseStats stats = entity.getBaseStats();
         
         allStats = new HashMap<>(30);
         allStats.put("PHYSICAL_increase_flat", (stats.strength * 1f) + (stats.dextirity * 0.1f));
         allStats.put("PHYSICAL_defence_flat", (stats.strength * 5.5f) + stats.armor);
+        
+        allStats.put("movement_speed", 1f);
         
     }
     

@@ -1,7 +1,6 @@
 package server.game.entities;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,7 +10,6 @@ import server.core.events.EntityTickEvent;
 import server.game.CalculatableStats;
 import server.game.BaseStats;
 import server.game.auras.Aura;
-import server.game.items.Item;
 import server.game.items.ItemStack;
 import server.game.powers.Health;
 import server.game.powers.Power;
@@ -22,6 +20,9 @@ public class EntityLiving extends EntityTicking {
     protected Power power;
     protected BaseStats baseStats;
     protected CalculatableStats calculatableStats;
+    
+    protected boolean isInMotion;
+    
     /**
      * 0-helm
      * 1-shoulder
@@ -37,24 +38,24 @@ public class EntityLiving extends EntityTicking {
      * 26-32 weapons
      */
     protected Set<Aura> auras;
-    protected Map<Integer, Item> equipment;
+    protected Map<Integer, ItemStack> equipment;
     protected Map<Integer, ItemStack> inventory;
     
     protected short inventorySize = 22;
     
-    public EntityLiving(int displayID, Vector3f position, BaseStats stats){
+    public EntityLiving(int displayID, Vector3f position){
         super(displayID, position, true);
-        auras = Collections.newSetFromMap(new ConcurrentHashMap<Aura, Boolean>());
-        inventory = new HashMap<Integer, ItemStack>();
-        this.baseStats = stats;
-        calculatableStats.recalcAll(this);
+        this.auras = Collections.newSetFromMap(new ConcurrentHashMap<Aura, Boolean>());
+        this.inventory = new ConcurrentHashMap<>();
+        this.equipment = new ConcurrentHashMap<>();
+        this.baseStats = new BaseStats(this);
+        this.calculatableStats = new CalculatableStats(this);
     }
-    
-    
     
     @Override
     public void tick(EntityTickEvent event) {
-        
+        if(this.isInMotion)
+            position.add(forward.getAdd(calculatableStats.getStat("movement_speed")));
     }
     
     public void addAura(Aura aura){ auras.add(aura); }
@@ -71,8 +72,8 @@ public class EntityLiving extends EntityTicking {
         return equipment.containsKey(slot);
     }
     
-    public Item equipItem(int slot, Item item){
-        return equipment.put(slot, item);
+    public ItemStack equipItem(int slot, ItemStack itemStack){
+        return equipment.put(slot, itemStack);
     }
     
     public boolean addItemToInventory(int slotID, ItemStack itemStack){
