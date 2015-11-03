@@ -25,14 +25,7 @@ public class Server implements Runnable {
     private ServerSocketChannel serverChannel;
     private Selector selector;
     
-    @Deprecated private Map<SocketChannel, Queue<Packet>> toWriteData = new ConcurrentHashMap<>();
-    @Deprecated private Map<SocketChannel, Deque<Byte>> readData = new ConcurrentHashMap<>();
-    
-    private Set<Client> clients = new ConcurrentSkipListSet<>();
-    
-    private ByteBuffer tempReadBuffer = ByteBuffer.allocate(1024);
-    private ByteBuffer headReader = ByteBuffer.allocate(Packet.HEADER_SIZE);
-    private ByteBuffer dataReader = ByteBuffer.allocate(1024);
+    private Map<SocketChannel, Client> clients = new ConcurrentHashMap<>();
     
     private void init(){
         try {
@@ -75,68 +68,16 @@ public class Server implements Runnable {
                 }
                 
                 if(key.isWritable()){
-                    //Logger.logInfo("Writing to client connection");
-                    write(key);
+                	clients.get(key.channel()).write(key);
                 }
                 
                 if(key.isReadable()){
-                    //Logger.logInfo("Reading from client connection");
-                    read(key);
+                	clients.get(key.channel()).read(key);
                 }
             }
         }
         
         closeServer();
-    }
-    
-    public void sendPacket(SocketChannel to, Packet packet){
-        toWriteData.get(to).add(packet);
-    }
-    
-    public boolean hasPacketsToRead(SocketChannel from){
-        return !readData.get(from).isEmpty();
-    }
-    
-    /**
-     * @param from The client who's packets to read.
-     * @returna ByteBuffer if there was an unprocessed packet. Null otherwise.
-     */
-    public boolean tryReadNextPacket(SocketChannel from){
-        Deque<Byte> bytes = readData.get(from);
-        
-        if(bytes.size() > Packet.HEADER_SIZE){
-            // Get the first 4 bytes of the Deque
-            headReader.put(bytes.pollFirst());
-            headReader.put(bytes.pollFirst());
-            headReader.put(bytes.pollFirst());
-            headReader.put(bytes.pollFirst());
-            headReader.flip();
-            
-            short type = headReader.getShort();
-            short size = headReader.getShort();
-            
-            // and check if it has enough to contruct a packet.
-            if(bytes.size() >= size){
-                
-                for(int i = 0; i < size; i++){
-                    dataReader.put(bytes.pollFirst());
-                }
-                
-                dataReader.flip();
-                PacketManager.forwardPacket(from, type, dataReader);
-                dataReader.clear();
-                return true;
-            }else{
-                // Return all the bytes to the queue.
-                bytes.addFirst(headReader.get(3));
-                bytes.addFirst(headReader.get(2));
-                bytes.addFirst(headReader.get(1));
-                bytes.addFirst(headReader.get(0));
-                headReader.clear();
-            }
-        }
-        
-        return false;
     }
     
     @Override
@@ -156,61 +97,6 @@ public class Server implements Runnable {
         Thread.currentThread().interrupt();
     }
     
-    private void closeChannel(SocketChannel channel){
-        try {
-            channel.socket().close();
-            channel.close();
-            toWriteData.remove(channel);
-        } catch (IOException e) {}
-    }
-    
-    private void read(SelectionKey key) {
-        SocketChannel channel = (SocketChannel) key.channel();
-        
-        try {
-            int readAmount = channel.read(tempReadBuffer);
-            if(readAmount == 0)
-                return;
-            tempReadBuffer.flip();
-            
-            Deque<Byte> unprocessedData = readData.get(channel);
-            
-            while(tempReadBuffer.hasRemaining())
-                unprocessedData.add(tempReadBuffer.get());
-            
-            tempReadBuffer.clear();
-            
-            while( tryReadNextPacket(channel) );
-            
-        } catch (IOException e) {
-            Logger.logExceptionInfo(e);
-            closeChannel(channel);
-        }
-        
-        // Check for amount of data read.
-        key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
-    }
-    
-
-    private void write(SelectionKey key) {
-        SocketChannel channel = (SocketChannel) key.channel();
-        
-        Queue<Packet> dataQueue = toWriteData.get(channel);
-        
-        if(dataQueue.isEmpty())
-            return;
-        
-        try {
-            channel.write(dataQueue.poll().getData());
-        } catch (IOException e) {
-            Logger.logExceptionInfo(e);
-            closeChannel(channel);
-        }
-        
-        key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
-    }
-
-
     private void accept(SelectionKey key) {
         ServerSocketChannel channel = (ServerSocketChannel) key.channel();
         try {
@@ -218,8 +104,7 @@ public class Server implements Runnable {
             socketChannel.configureBlocking(false);
             socketChannel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
             
-            toWriteData.put(socketChannel, new LinkedBlockingQueue<Packet>(16));
-            readData.put(socketChannel, new LinkedBlockingDeque<Byte>(4096));
+            clients.put(socketChannel, new Client(socketChannel));
             
             Logger.logInfo("Accepted connection "+ socketChannel.getRemoteAddress().toString());
         } catch (IOException e) {

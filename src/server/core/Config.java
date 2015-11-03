@@ -9,6 +9,8 @@ import java.util.Iterator;
 
 import org.json.JSONObject;
 
+import braynstorm.commonlib.Logger;
+
 public class Config {
     private static boolean wasConfigChanged = false;
     
@@ -51,8 +53,9 @@ public class Config {
                 mapJSON(new JSONObject(data));
             
         } catch (IOException e){
-            useDefaults();
+        	Logger.logWarning("Couldn't find config.cfg. Using defaults.");
             Logger.logExceptionWarning(e);
+            useDefaults();
         }
         
         I = true;

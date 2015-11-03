@@ -1,5 +1,7 @@
 package server.game.powers;
 
+import java.nio.ByteBuffer;
+
 import server.game.entities.EntityLiving;
 
 public abstract class Power {
@@ -14,6 +16,19 @@ public abstract class Power {
         this.name = name;
         setMax(max);
         setCurrent(current);
+    }
+    
+    public byte[] getData(){
+    	ByteBuffer data = ByteBuffer.allocate(Float.BYTES * 3 + name.length() * Character.BYTES);
+    	
+    	data.putFloat(current);
+    	data.putFloat(max);
+    	data.putFloat(regenRate);
+    	
+    	for(int i = 0; i < name.length(); i++)
+    		data.putChar(name.charAt(i));
+    	
+    	return data.array();
     }
     
     public void setMax(float max){

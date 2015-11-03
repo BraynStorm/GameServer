@@ -60,7 +60,7 @@ public class Packet {
         ByteBuffer buffer = allocatePacket(size);
         
         // Header
-        buffer.putShort(OPCodes.ENTITY_UPDATE);
+        buffer.putShort(OPCodes.ENTITY_MOTION_UPDATE);
         buffer.putShort(size);
         
         // Data
