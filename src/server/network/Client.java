@@ -10,6 +10,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import braynstorm.commonlib.Logger;
+import server.game.Account;
 
 public class Client {
     private SocketChannel channel;
@@ -128,5 +129,9 @@ public class Client {
 				Logger.logExceptionInfo(e);
 			}
     	}
+    }
+
+    public void setAccount(Account account){
+        
     }
 }

@@ -92,7 +92,13 @@ public class Config {
     }
     
     private static void initDefaults(){
+        // Integers
         defaultIntegers.put("serverPort", 33055);
+        
+        // Floats
+        
+        // Strings
+        defaultStrings.put("databaseName", "gamedb");
     }
     
     /**

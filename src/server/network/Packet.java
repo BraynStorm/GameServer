@@ -37,7 +37,7 @@ public class Packet {
     public static Packet createPingPacket(){
         ByteBuffer buffer = allocatePacket(Long.BYTES);
         
-        buffer.putShort(OPCodes.PING);
+        buffer.putShort(PacketType.PING);
         buffer.putShort((short) Long.BYTES);
         buffer.putLong(System.currentTimeMillis());
         
@@ -47,7 +47,7 @@ public class Packet {
     public static Packet createLoginStatusPacket(byte status){
         ByteBuffer buffer = allocatePacket(Short.BYTES);
         
-        buffer.putShort(OPCodes.LOGIN_STATUS);
+        buffer.putShort(PacketType.LOGIN_STATUS);
         buffer.putShort((short) 1);
         buffer.put(status);
         
@@ -60,7 +60,7 @@ public class Packet {
         ByteBuffer buffer = allocatePacket(size);
         
         // Header
-        buffer.putShort(OPCodes.ENTITY_MOTION_UPDATE);
+        buffer.putShort(PacketType.ENTITY_MOTION_UPDATE);
         buffer.putShort(size);
         
         // Data

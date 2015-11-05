@@ -3,8 +3,11 @@ package server.core;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.sql.SQLException;
 
 import braynstorm.commonlib.Logger;
+import server.core.db.Database;
+import server.game.World;
 import server.network.Server;
 public class Main {
 	private static String mainDir = "";
@@ -12,6 +15,8 @@ public class Main {
 	
 	private Thread serverThread;
 	private Server server;
+	private World world;
+	private Database database;
 	
 	private Main(){
 		
@@ -29,6 +34,12 @@ public class Main {
 		Logger.init(mainDir);
 		Config.init();
 		
+		database = new Database();
+		try {
+            Logger.logInfo(database.accountExists("glav0r23zzz4@gmail.com"));
+        } catch (SQLException e) {
+            Logger.logExceptionCritical(e);
+        }
 		
 		server = new Server();
 		serverThread = new Thread(server);
@@ -56,4 +67,12 @@ public class Main {
 	public static void main(String[] args){
 		Main.getInstance();
 	}
+
+    public static World getWorld() {
+        return getInstance().world;
+    }
+
+    public static Database getDatabase() {
+        return getInstance().database;
+    }
 }
