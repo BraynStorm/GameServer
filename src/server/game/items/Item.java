@@ -1,12 +1,16 @@
 package server.game.items;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import server.game.entities.EntityLiving;
 import server.game.spells.Spell;
 
 public abstract class Item {
+	protected static Map<Integer, Item> items = new HashMap<Integer,Item>();
+	
     protected final int id;
     protected final int metadata;
     protected final byte maxStackSize;
@@ -36,7 +40,7 @@ public abstract class Item {
     }
 
     /**
-     * Called after equpping the item.
+     * Called after equipping the item.
      */
     public void afterEquipItem(EntityLiving entity){
         castOnEquip.forEach(s -> {
@@ -68,6 +72,13 @@ public abstract class Item {
             return false;
         return true;
     }
+    
+	public static Item getItemByID(int id) {
+		if(!items.containsKey(id))
+			throw new ItemDoesntExistException(id);
+		
+		return items.get(id);
+	}
     
     
     

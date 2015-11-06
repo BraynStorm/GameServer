@@ -6,7 +6,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
 import braynstorm.commonlib.Logger;
@@ -15,6 +18,8 @@ import server.core.Config;
 import server.core.Main;
 import server.game.Account;
 import server.game.GameCharacter;
+import server.game.entities.EntityLiving;
+import server.game.items.ItemStack;
 
 public class Database {
 	
@@ -22,7 +27,7 @@ public class Database {
     
     private PreparedStatement account_fetch;
     private PreparedStatement account_characters_fetch;
-    //private PreparedStatement account_f
+    private PreparedStatement character_fetch_inventory;
 
     public Database() {
         MysqlDataSource dataSource = new MysqlDataSource();
@@ -60,6 +65,8 @@ public class Database {
         account_fetch.setFetchSize(1);
         
         account_characters_fetch = connection.prepareStatement("SELECT * FROM characters WHERE accountID=?");
+        
+        character_fetch_inventory = connection.prepareStatement("SELECT * FROM character_inventory WHERE characterID=? AND slotID<=? AND slotID>=?");
     }
     
     public boolean accountExists(String email) throws SQLException{
@@ -70,29 +77,43 @@ public class Database {
         return rs.first();
     }
     
-    public List<GameCharacter> fetchCharactersList(int accountID) throws SQLException{
+    public List<ShellCharacter> fetchCharactersList(int accountID) throws SQLException{
         account_characters_fetch.clearParameters();
         account_characters_fetch.setInt(1, accountID);
         ResultSet rs = account_characters_fetch.executeQuery();
         
         
-        List<GameCharacter> characters = new ArrayList<GameCharacter>(rs.getFetchSize());
+        List<ShellCharacter> characters = new ArrayList<ShellCharacter>(rs.getFetchSize());
+        Map<Integer, ItemStack> equipment;
         
-        while(rs.next())
+        while(rs.next()){
+        	equipment = new HashMap<Integer, ItemStack>(EntityLiving.EQUIPMENT_SLOTS_COUNT);
+        	character_fetch_inventory.setInt(1, rs.getInt(1)); // Character ID
+        	character_fetch_inventory.setInt(2, 0); // From slotID (inclusive)
+        	character_fetch_inventory.setInt(3, EntityLiving.EQUIPMENT_SLOTS_COUNT); // To slotID (inclusive)
+        	
+        	
+        	ResultSet items = character_fetch_inventory.executeQuery();
+        	while(items.next()){
+        		/*
+        		 * SQL: DB ItemStack,
+        		 * 		itemid,
+        		 * 		amount,
+        		 * 		enchantmentID_perm
+        		 */
+        		ItemStack itemStack = new ItemStack(items.getInt("itemID"));
+        		equipment.put(items.getInt("slotID"), itemStack);
+        	}
+        	
             characters.add(
-                    new GameCharacter(
-                            rs.getInt("id"),
+                    new ShellCharacter(
                             rs.getString("name"),
+                            Main.getWorld().getZone(rs.getInt("currentZone")).toString(),
                             rs.getInt("raceData"),
-                            Main.getWorld().getZone(rs.getInt("currentZone")),
-                            new Vector3f(
-                                    rs.getFloat("currentPositionX"),
-                                    rs.getFloat("currentPositionY"),
-                                    rs.getFloat("currentPositionZ")
-                            )
+                            equipment
                     )
             );
-        
+        }
         
         return characters;
     }

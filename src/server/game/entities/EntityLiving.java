@@ -16,7 +16,8 @@ import server.game.powers.Power;
 
 public class EntityLiving extends EntityTicking {
     
-    protected Health hp;
+    public static final int EQUIPMENT_SLOTS_COUNT = 33;
+	protected Health hp;
     protected Power power;
     protected BaseStats baseStats;
     protected CalculatableStats calculatableStats;
