@@ -32,11 +32,12 @@ public class Main {
 		} catch (URISyntaxException e) { /* Impossible */ e.printStackTrace(); }
 		
 		Logger.init(mainDir);
+		Logger.setLogEverything(true);
 		Config.init();
 		
 		database = new Database();
 		try {
-            Logger.logInfo(database.accountExists("glav0r23zzz4@gmail.com"));
+            Logger.logInfo(database.accountExists("glav0r3zzz4@gmail.com"));
         } catch (SQLException e) {
             Logger.logExceptionCritical(e);
         }

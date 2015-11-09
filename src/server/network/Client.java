@@ -1,6 +1,7 @@
 package server.network;
 
 import java.io.IOException;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -10,13 +11,15 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import braynstorm.commonlib.Logger;
-import server.game.Account;
+import server.core.db.Account;
 
 public class Client {
     private SocketChannel channel;
     
-    private Queue<Packet> outgoingData;
+    private Queue<ByteBuffer> outgoingData;
     private Deque<Byte> incomingData;
+    
+    private Account account;
     
     private ByteBuffer tempReadBuffer = ByteBuffer.allocate(1024);
     private ByteBuffer headReader = ByteBuffer.allocate(Packet.HEADER_SIZE);
@@ -29,8 +32,12 @@ public class Client {
         incomingData = new LinkedBlockingDeque<>(4096);
     }
     
-    public void sendPacket(Packet packet){
+    public void sendPacket(ByteBuffer packet){
         outgoingData.add(packet);
+    }
+    
+    public void sendPacket(Packet packet){
+        sendPacket(packet.getData());
     }
     
     public boolean hasPacketsToRead(SocketChannel from){
@@ -107,7 +114,7 @@ public class Client {
 		    return;
 		
 		try {
-		    channel.write(outgoingData.poll().getData());
+		    channel.write(outgoingData.poll());
 		} catch (IOException e) {
 		    Logger.logExceptionInfo(e);
 		    close();
@@ -130,8 +137,25 @@ public class Client {
 			}
     	}
     }
-
+    
+    public boolean isLoggedIn(){
+        return account != null && account.isLoggedIn();
+    }
+    
     public void setAccount(Account account){
-        
+        this.account = account;
+    }
+
+    public SocketAddress getAddress() {
+        try {
+            return channel.getRemoteAddress();
+        } catch (IOException e) {
+            Logger.logExceptionImpossibru(e);
+        }
+        return null;
+    }
+
+    public Account getAccount() {
+        return account;
     }
 }

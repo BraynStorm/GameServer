@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 import braynstorm.commonlib.math.Vector3f;
+import braynstorm.commonlib.network.PacketType;
 import server.game.entities.Entity;
 
 public class Packet {

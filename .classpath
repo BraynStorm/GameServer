@@ -5,6 +5,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Guava"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/CommonLib"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JSON"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/ConnectorJ"/>
+	<classpathentry kind="lib" path="D:/Braynstorm/workspace/mysql-connector-java-5.1.18-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

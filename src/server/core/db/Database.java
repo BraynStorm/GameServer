@@ -16,8 +16,6 @@ import braynstorm.commonlib.Logger;
 import braynstorm.commonlib.math.Vector3f;
 import server.core.Config;
 import server.core.Main;
-import server.game.Account;
-import server.game.GameCharacter;
 import server.game.entities.EntityLiving;
 import server.game.items.ItemStack;
 
@@ -84,10 +82,10 @@ public class Database {
         
         
         List<ShellCharacter> characters = new ArrayList<ShellCharacter>(rs.getFetchSize());
-        Map<Integer, ItemStack> equipment;
+        Map<Character, ItemStack> equipment;
         
         while(rs.next()){
-        	equipment = new HashMap<Integer, ItemStack>(EntityLiving.EQUIPMENT_SLOTS_COUNT);
+        	equipment = new HashMap<>(EntityLiving.EQUIPMENT_SLOTS_COUNT);
         	character_fetch_inventory.setInt(1, rs.getInt(1)); // Character ID
         	character_fetch_inventory.setInt(2, 0); // From slotID (inclusive)
         	character_fetch_inventory.setInt(3, EntityLiving.EQUIPMENT_SLOTS_COUNT); // To slotID (inclusive)
@@ -102,13 +100,15 @@ public class Database {
         		 * 		enchantmentID_perm
         		 */
         		ItemStack itemStack = new ItemStack(items.getInt("itemID"));
-        		equipment.put(items.getInt("slotID"), itemStack);
+        		
+        		// Short.BYTES == Character.BYTES;
+        		equipment.put((char)items.getShort("slotID"), itemStack);
         	}
         	
             characters.add(
                     new ShellCharacter(
                             rs.getString("name"),
-                            Main.getWorld().getZone(rs.getInt("currentZone")).toString(),
+                            new Vector3f(rs.getFloat("currentPositionX"), rs.getFloat("currentPositionY"), rs.getFloat("currentPositionZ")),
                             rs.getInt("raceData"),
                             equipment
                     )
@@ -118,28 +118,32 @@ public class Database {
         return characters;
     }
     
-    public Account fetchAccount(String email, String password) throws WrongPasswordException, AccountDoesntExistException, AccountIsSuspendedException, SQLException{
-        account_fetch.setString(1, email);
-        ResultSet rs = account_fetch.executeQuery();
+    public Account fetchAccount(String email, String password) throws WrongPasswordException, AccountDoesntExistException, AccountIsSuspendedException{
+        try{
+            account_fetch.setString(1, email);
+            ResultSet rs = account_fetch.executeQuery();
+            
+            if(!rs.next())
+                throw new AccountDoesntExistException(); 
+            
+            String passFromDB = rs.getString("password");
+            
+            if(!password.equals(passFromDB))
+                throw new WrongPasswordException();
+            
+            Date suspendedUntil = rs.getDate("suspendedUntil");
+            
+            if(suspendedUntil.after(new Date(System.currentTimeMillis())))
+                throw new AccountIsSuspendedException(suspendedUntil);
+            
+            int id = rs.getInt(1);
+            Date registeredOn = rs.getDate("registeredOn");
+            
+            return new Account(id, fetchCharactersList(id), registeredOn);
+        } catch (SQLException e){
+            Logger.logExceptionImpossibru(e);
+        }
         
-        if(!rs.next())
-            throw new AccountDoesntExistException(); 
-        
-        String passFromDB = rs.getString("password");
-        
-        if(!password.equals(passFromDB))
-            throw new WrongPasswordException();
-        
-        Date suspendedUntil = rs.getDate("suspendedUntil");
-        
-        if(suspendedUntil.after(new Date(System.currentTimeMillis())))
-            throw new AccountIsSuspendedException(suspendedUntil);
-        
-        int id = rs.getInt(1);
-        Date registeredOn = rs.getDate("registeredOn");
-        
-        
-        
-        return new Account(id, fetchCharactersList(id), registeredOn, suspendedUntil);
+        return null;
     }
 }

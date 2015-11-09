@@ -1,11 +1,17 @@
 package server.game.entities;
 
+import java.nio.ByteBuffer;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import braynstorm.commonlib.Common;
 import braynstorm.commonlib.math.Vector3f;
+import braynstorm.commonlib.network.PacketSize;
+import braynstorm.commonlib.network.PacketType;
 import server.core.events.EntityTickEvent;
 import server.game.CalculatableStats;
 import server.game.BaseStats;
@@ -39,16 +45,16 @@ public class EntityLiving extends EntityTicking {
      * 26-32 weapons
      */
     protected Set<Aura> auras;
-    protected Map<Integer, ItemStack> equipment;
-    protected Map<Integer, ItemStack> inventory;
+    protected Map<Character, ItemStack> equipment;
+    protected Map<Character, ItemStack> inventory;
     
     protected short inventorySize = 22;
     
     public EntityLiving(int displayID, Vector3f position){
         super(displayID, position, true);
-        this.auras = Collections.newSetFromMap(new ConcurrentHashMap<Aura, Boolean>());
-        this.inventory = new ConcurrentHashMap<>();
-        this.equipment = new ConcurrentHashMap<>();
+        this.auras = new HashSet<>();//Collections.newSetFromMap(new ConcurrentHashMap<Aura, Boolean>());
+        this.inventory = new HashMap<>(); // TODO Make Concurrent
+        this.equipment = new HashMap<>(); // TODO Make Concurrent
         this.baseStats = new BaseStats(this);
         this.calculatableStats = new CalculatableStats(this);
     }
@@ -73,19 +79,19 @@ public class EntityLiving extends EntityTicking {
         return equipment.containsKey(slot);
     }
     
-    public ItemStack equipItem(int slot, ItemStack itemStack){
+    public ItemStack equipItem(char slot, ItemStack itemStack){
         return equipment.put(slot, itemStack);
     }
     
-    public boolean addItemToInventory(int slotID, ItemStack itemStack){
-        if(inventory.containsKey(slotID)){
+    public boolean addItemToInventory(char slotID, ItemStack itemStack){
+        if(inventory.containsKey(slotID)) {
             ItemStack stackInSlot = inventory.get(slotID);
             int maxStackSize = itemStack.getItem().getMaxStackSize();
             
-            if(stackInSlot.getItem().equals(itemStack.getItem()) && stackInSlot.getAmount() != stackInSlot.getItem().getMaxStackSize()){
+            if(stackInSlot.getItem().equals(itemStack.getItem()) && stackInSlot.getAmount() != stackInSlot.getItem().getMaxStackSize()) {
                 int newStackSize = (stackInSlot.getAmount() + itemStack.getAmount());
                 
-                if(newStackSize <= maxStackSize){
+                if(newStackSize <= maxStackSize) {
                     itemStack.setAmount(0);
                     stackInSlot.setAmount(newStackSize);
                     return true;
@@ -93,10 +99,10 @@ public class EntityLiving extends EntityTicking {
                 
                 itemStack.setAmount(newStackSize - maxStackSize);
                 stackInSlot.setAmount(maxStackSize);
-            }else{
+            } else {
                 return false;
             }
-        }else{
+        } else {
             inventory.put(slotID, itemStack);
             return true;
         }
@@ -104,26 +110,34 @@ public class EntityLiving extends EntityTicking {
         return true;
     }
     
+    public ByteBuffer getPacketMotionUpdate(){
+        ByteBuffer packet = Common.createPacket(PacketType.ENTITY_MOTION_UPDATE, PacketSize.ENTITY_MOTION_UPDATE);
+        packet
+            .put(isInMotion ? (byte) 1 : 0)
+            .put(position.getByteBuffer())
+            .put(forward.getByteBuffer())
+            .put(up.getByteBuffer()).flip();
+        
+        
+        return packet;
+    }
+    
     public boolean isDead(){ return hp.isZero(); }
     
     public float getCurrentHP(){ return hp.getCurrent(); }
-    public float getMaxHP() { return hp.getMax(); }
-    public float getPower() { return power.getCurrent(); }
+    public float getMaxHP(){ return hp.getMax(); }
+    public float getPower(){ return power.getCurrent(); }
     public float getMaxPower(){ return power.getMax(); }
     
     public void setHP(float hp){ ; }
     public void setPower(float power) { this.power.setCurrent(power); }
     public void setMaxHP(float maxHP) { this.hp.setMax(maxHP); }
     public void setMaxPower(float maxPower) { this.power.setMax(maxPower); }
-
-
-
+    
     public Health getHealth() {
         return hp;
     }
-
-
-
+    
     public BaseStats getBaseStats() {
         return baseStats;
     }

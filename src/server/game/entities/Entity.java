@@ -1,7 +1,7 @@
 package server.game.entities;
 
+import braynstorm.commonlib.Common;
 import braynstorm.commonlib.math.Vector3f;
-import server.core.utils.Common;
 
 public class Entity {
     protected int displayID;

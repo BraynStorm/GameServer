@@ -1,5 +1,6 @@
 package server.game.items;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,10 +10,11 @@ import server.game.entities.EntityLiving;
 import server.game.spells.Spell;
 
 public abstract class Item {
+    public static final int BYTES = Integer.BYTES * 2;
 	protected static Map<Integer, Item> items = new HashMap<Integer,Item>();
 	
     protected final int id;
-    protected final int metadata;
+    protected final short metadata;
     protected final byte maxStackSize;
     
     protected List<Spell> castOnAqquire;
@@ -30,7 +32,7 @@ public abstract class Item {
         return maxStackSize;
     }
     
-    public Item(int id, int metadata, byte maxStackSize) {
+    public Item(int id, short metadata, byte maxStackSize) {
         this.id = id;
         this.metadata = metadata;
         this.maxStackSize = maxStackSize;
@@ -79,6 +81,13 @@ public abstract class Item {
 		
 		return items.get(id);
 	}
+
+    public ByteBuffer getData() {
+        ByteBuffer data = ByteBuffer.allocate(Integer.BYTES + Short.BYTES);
+        data.putInt(id);
+        data.putShort(metadata);
+        return data;
+    }
     
     
     
