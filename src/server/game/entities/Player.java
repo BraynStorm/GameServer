@@ -1,8 +1,9 @@
 package server.game.entities;
 
+import java.nio.ByteBuffer;
+
 import server.core.db.ShellCharacter;
 import server.network.Client;
-import server.network.Packet;
 
 public class Player extends EntityLiving {
     
@@ -23,7 +24,9 @@ public class Player extends EntityLiving {
         throw new RuntimeException();
     }
     
-    public void sendPacket(Packet packet) {
+    public void sendPacket(ByteBuffer packet) {
         client.sendPacket(packet);
     }
+
+	
 }

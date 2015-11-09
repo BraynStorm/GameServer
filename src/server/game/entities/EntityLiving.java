@@ -1,12 +1,12 @@
 package server.game.entities;
 
 import java.nio.ByteBuffer;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+//import java.util.concurrent.ConcurrentHashMap;
+
 
 import braynstorm.commonlib.Common;
 import braynstorm.commonlib.math.Vector3f;
@@ -57,12 +57,14 @@ public class EntityLiving extends EntityTicking {
         this.equipment = new HashMap<>(); // TODO Make Concurrent
         this.baseStats = new BaseStats(this);
         this.calculatableStats = new CalculatableStats(this);
+        dirtyFlags = new Dirtyness();
     }
     
     @Override
     public void tick(EntityTickEvent event) {
-        if(this.isInMotion)
-            position.add(forward.getAdd(calculatableStats.getStat("movement_speed")));
+        if(isInMotion){
+        	move(forward, calculatableStats.getStat("movement_speed"));
+        }
     }
     
     public void addAura(Aura aura){ auras.add(aura); }
@@ -112,15 +114,16 @@ public class EntityLiving extends EntityTicking {
     
     public ByteBuffer getPacketMotionUpdate(){
         ByteBuffer packet = Common.createPacket(PacketType.ENTITY_MOTION_UPDATE, PacketSize.ENTITY_MOTION_UPDATE);
-        packet
-            .put(isInMotion ? (byte) 1 : 0)
-            .put(position.getByteBuffer())
-            .put(forward.getByteBuffer())
-            .put(up.getByteBuffer()).flip();
         
+        packet.put(isInMotion ? (byte) 1 : 0);
+        packet.put(position.getByteBuffer());
+        packet.put(forward.getByteBuffer());
+        packet.put(up.getByteBuffer());
         
+        packet.flip();
         return packet;
     }
+    
     
     public boolean isDead(){ return hp.isZero(); }
     
@@ -129,10 +132,12 @@ public class EntityLiving extends EntityTicking {
     public float getPower(){ return power.getCurrent(); }
     public float getMaxPower(){ return power.getMax(); }
     
-    public void setHP(float hp){ ; }
-    public void setPower(float power) { this.power.setCurrent(power); }
-    public void setMaxHP(float maxHP) { this.hp.setMax(maxHP); }
-    public void setMaxPower(float maxPower) { this.power.setMax(maxPower); }
+    public void setHP(float hp){ this.hp.setCurrent(hp); markDirty(Dirtyness.POWERS); }
+    public void setPower(float power){ this.power.setCurrent(power); markDirty(Dirtyness.POWERS); }
+    public void setMaxHP(float maxHP){ this.hp.setMax(maxHP); markDirty(Dirtyness.POWERS);}
+    public void setMaxPower(float maxPower){ this.power.setMax(maxPower); markDirty(Dirtyness.POWERS); }
+    
+    public void setIsInMotion(boolean v){ this.isInMotion = v; }
     
     public Health getHealth() {
         return hp;

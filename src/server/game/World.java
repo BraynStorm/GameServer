@@ -1,13 +1,16 @@
 package server.game;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 import braynstorm.commonlib.math.Vector3f;
+import server.core.Config;
+import server.game.entities.Dirtyness;
 import server.game.entities.EntityLiving;
 import server.game.entities.Player;
 import server.game.spells.Shape;
-import server.network.Packet;
+import server.game.spells.ShapeCircle;
 
 public class World {
 
@@ -15,7 +18,13 @@ public class World {
     private List<EntityLiving> npcs;
     private List<Player> playerCharacters;
     
-    public List<EntityLiving> getAllEntitiesInShape(Shape shape){
+    private float viewDistance;
+    
+    public World() {
+    	viewDistance = Config.getValuef("viewDistance");
+	}
+
+	public List<EntityLiving> getAllEntitiesInShape(Shape shape){
         // TODO make shapes like circle , sphere, square, box, 'path'
         
         List<EntityLiving> resultList = new ArrayList<>();
@@ -47,7 +56,24 @@ public class World {
         return resultList;
     }
     
-    public void sendPacketToPlayersInShape(Packet packet, Shape shape){
+    /**
+     * Every tick, the server updates all the players on all the entities.
+     */
+    public void tick(){
+    	playerCharacters.forEach(player -> {
+			Shape viewDistanceCircle = new ShapeCircle(player.getPosition(), viewDistance);
+			
+			playerCharacters.forEach(player2 ->{
+				if(viewDistanceCircle.isPointInShape(player2.getPosition()))
+					player2.sendPacket(player.getPacketMotionUpdate());
+			});
+			
+			//FIXME not nearly done with the 'cleaning'.
+			player.markClean(Dirtyness.MOTION);
+    	});
+    }
+    
+    public void sendPacketToPlayersInShape(ByteBuffer packet, Shape shape){
         List<Player> players = getPlayersInShape(shape);
         
         players.forEach(player ->{

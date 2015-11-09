@@ -96,6 +96,7 @@ public class Config {
         defaultIntegers.put("serverPort", 33055);
         
         // Floats
+        defaultFloats.put("viewDistance", 100f);
         
         // Strings
         defaultStrings.put("databaseName", "gamedb");

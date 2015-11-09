@@ -5,12 +5,13 @@ import java.util.ArrayList;
 
 import braynstorm.commonlib.Common;
 import braynstorm.commonlib.Logger;
-import braynstorm.commonlib.network.PacketSize;
+import braynstorm.commonlib.math.Vector3f;
 import braynstorm.commonlib.network.PacketType;
 import server.core.Main;
 import server.core.db.AccountDoesntExistException;
 import server.core.db.AccountIsSuspendedException;
 import server.core.db.WrongPasswordException;
+import server.game.entities.Player;
 
 public class PacketManager {
     private static int temp;
@@ -25,7 +26,7 @@ public class PacketManager {
                 break;
             
             case PacketType.LOGIN_ATTEMPT:
-                StringBuilder sbEmail = new StringBuilder(); 
+                StringBuilder sbEmail = new StringBuilder(256); 
                 StringBuilder sbPass = new StringBuilder(61); // Password is 60 characters long.
                 
                 for(int i = 0; data.hasRemaining() && i < 350; i++)
@@ -43,15 +44,15 @@ public class PacketManager {
                     temp = 0;
                     ArrayList<ByteBuffer> charactersData = new ArrayList<>();
                     
-                    client.getAccount().getCharacterList().forEach(character ->{
+                    client.getAccount().getCharacterList().forEach(character -> {
                         ByteBuffer charData = character.getData();
                         temp += charData.capacity();
                         charactersData.add(charData);
                     });
                     
-                    packet = Common.createPacket(PacketType.LOGIN_STATUS, 1 + 1 + temp)
-                        .put((byte) 1) // Status
-                        .put((byte) charactersData.size());
+                    packet = Common.createPacket(PacketType.LOGIN_STATUS, 1 + 1 + temp);
+                    packet.put((byte) 1); // Status
+                    packet.put((byte) charactersData.size());
                     
                     for(ByteBuffer charData : charactersData){
                     	packet.put(charData);
@@ -80,14 +81,24 @@ public class PacketManager {
                     packet.putLong((System.currentTimeMillis() - e.getSuspendedUntil().getTime()) / 1000);
                 }
                 
-                if(packet == null){
-                    // Something fucked up...
-                	Logger.logImpossibru("Packet is NULL");
-                	break;
-                }
-                
                 client.sendPacket(packet);
                 break;
+                
+            case PacketType.ENTITY_MOTION_UPDATE:
+            	// FIXME Possible ACCOUNT NPE.
+            	Player currentPlayer = client.getAccount().getPlayerCharacter();
+            	
+            	if(currentPlayer == null){
+            		Logger.logWarning("ENTITY_MOTION_UPDATE packet recieved form an account that hasn't chosen a character. SKIPPING.");
+            		break;
+            	}
+            	
+            	currentPlayer.setIsInMotion(data.get() == 0 ? false : true);
+            	currentPlayer.setPosition(Vector3f.readFromBuffer(data));
+            	currentPlayer.setForward(Vector3f.readFromBuffer(data));
+            	currentPlayer.setUp(Vector3f.readFromBuffer(data));
+            	
+            	break;
         }
     }
     

@@ -11,8 +11,7 @@ public class Entity {
     protected Vector3f up;
     
     protected boolean isVisible;
-    protected boolean isDirty;
-    
+    protected Dirtyness dirtyFlags;
     
     public Entity(int displayID, Vector3f position, boolean isVisible) {
         this.displayID = displayID;
@@ -20,21 +19,38 @@ public class Entity {
         this.forward = new Vector3f(0, 0, 1);
         this.up = new Vector3f(0, 1, 0);
         this.isVisible = isVisible;
+        
+        dirtyFlags = new Dirtyness();
     }
     
     public void lookAt(Vector3f point){
         forward = point.getNormalized();
         up = forward.cross(Vector3f.Y_AXIS).cross(forward);
-        markDirty();
+        markDirty(Dirtyness.MOTION);
     }
     
     public void setPosition(Vector3f position) {
         this.position = position;
-        markDirty();
+        markDirty(Dirtyness.MOTION);
     }
     
-    /**
-     * XXX Possibly HEAVY
+    public void setForward(Vector3f forward) {
+		this.forward = forward;
+		markDirty(Dirtyness.MOTION);
+	}
+
+	public void setUp(Vector3f up) {
+		this.up = up;
+		markDirty(Dirtyness.MOTION);
+	}
+	
+	public void move(Vector3f direction, float amount){
+		this.position.add(direction.getMul(amount));
+		markDirty(Dirtyness.MOTION);
+	}
+	
+	/**
+     * FIXME Possibly HEAVY
      * @param angle
      */
     public void rotateX(float angle){
@@ -46,11 +62,11 @@ public class Entity {
         forward.rotate(angle, horizontalAxis).normalize();
         up = forward.cross(horizontalAxis).normalize();
         
-        markDirty();
+        markDirty(Dirtyness.MOTION);
     }
     
     /**
-     * XXX Possibly HEAVY
+     * FIXME Possibly HEAVY
      * @param angle
      */
     public void rotateY(float angle){
@@ -62,13 +78,22 @@ public class Entity {
         forward.rotate(angle, Common.Y_AXIS).normalize();
         up = forward.cross(horizontalAxis).normalize();
         
-        markDirty();
+        markDirty(Dirtyness.MOTION);
     }
     
-    public void markDirty(){ isDirty = true; }
-    public void markClean(){ isDirty = false; }
-    public boolean isDirty(){ return isDirty; }
-    public int getDisplayID(){ return displayID; }
+    protected void markDirty(byte type) {
+		dirtyFlags.markDirty(type);
+	}
+
+    public void markClean(byte type) {
+		dirtyFlags.markClean(type);
+	}
+
+	public boolean isDirty(byte type) {
+		return dirtyFlags.getDirty(type);
+	}
+
+	public int getDisplayID(){ return displayID; }
     public boolean isVisible(){ return isVisible; }
     public Vector3f getPosition(){ return position; }
     public Vector3f getForward(){ return forward; }

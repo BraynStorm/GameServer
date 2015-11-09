@@ -25,6 +25,8 @@ public class Client {
     private ByteBuffer headReader = ByteBuffer.allocate(Packet.HEADER_SIZE);
     private ByteBuffer dataReader = ByteBuffer.allocate(1024);
     
+    //private long lastPingPacketRecieved = 0;
+    
     public Client(SocketChannel channel) {
         this.channel = channel;
         

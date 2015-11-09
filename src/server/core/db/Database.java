@@ -15,7 +15,6 @@ import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import braynstorm.commonlib.Logger;
 import braynstorm.commonlib.math.Vector3f;
 import server.core.Config;
-import server.core.Main;
 import server.game.entities.EntityLiving;
 import server.game.items.ItemStack;
 
