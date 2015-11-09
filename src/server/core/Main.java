@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import braynstorm.commonlib.Logger;
 import server.core.db.Database;
 import server.game.World;
+import server.network.PacketManager;
 import server.network.Server;
 public class Main {
 	private static String mainDir = "";
@@ -41,6 +42,8 @@ public class Main {
         } catch (SQLException e) {
             Logger.logExceptionCritical(e);
         }
+		
+		PacketManager.init();
 		
 		server = new Server();
 		serverThread = new Thread(server);

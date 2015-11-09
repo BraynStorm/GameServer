@@ -26,9 +26,9 @@ public class Damage {
      * 
      * Damage always respects immunities.<br>
      * @param entity
-     * @return
+     * @return 1: Actual Damage Delt<br>2: Overkill.
      */
-    public float dealTo(EntityLiving entity){
+    public float[] dealTo(EntityLiving entity){
         
         float finalDamage = amount;
         CalculatableStats stats = entity.getCalculatedStats();
@@ -46,10 +46,10 @@ public class Damage {
         if(finalDamage < 1f)
             finalDamage = 0;
         
-        return entity.getHealth().use(finalDamage, true);
+        return new float[] {finalDamage, entity.getHealth().use(finalDamage, true)};
     }
     
-    public static void dealDamageTo(int amount, DamageType type, int absolutness, EntityLiving entity){
-        
+    public static float[] dealDamageTo(float amount, DamageType type, int absolutness, EntityLiving entity){
+        return new Damage(amount, type, absolutness).dealTo(entity);
     }
 }

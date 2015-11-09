@@ -8,6 +8,7 @@ import java.util.Set;
 //import java.util.concurrent.ConcurrentHashMap;
 
 
+
 import braynstorm.commonlib.Common;
 import braynstorm.commonlib.math.Vector3f;
 import braynstorm.commonlib.network.PacketSize;
@@ -23,7 +24,10 @@ import server.game.powers.Power;
 public class EntityLiving extends EntityTicking {
     
     public static final int EQUIPMENT_SLOTS_COUNT = 33;
-	protected Health hp;
+	
+    protected String name;
+    
+    protected Health hp;
     protected Power power;
     protected BaseStats baseStats;
     protected CalculatableStats calculatableStats;
@@ -50,8 +54,9 @@ public class EntityLiving extends EntityTicking {
     
     protected short inventorySize = 22;
     
-    public EntityLiving(int displayID, Vector3f position){
+    public EntityLiving(String name, int displayID, Vector3f position){
         super(displayID, position, true);
+        this.name = name;
         this.auras = new HashSet<>();//Collections.newSetFromMap(new ConcurrentHashMap<Aura, Boolean>());
         this.inventory = new HashMap<>(); // TODO Make Concurrent
         this.equipment = new HashMap<>(); // TODO Make Concurrent
@@ -124,7 +129,7 @@ public class EntityLiving extends EntityTicking {
         return packet;
     }
     
-    
+    public boolean isInMotion(){ return isInMotion; }
     public boolean isDead(){ return hp.isZero(); }
     
     public float getCurrentHP(){ return hp.getCurrent(); }
@@ -150,4 +155,8 @@ public class EntityLiving extends EntityTicking {
     public CalculatableStats getCalculatedStats() {
         return calculatableStats;
     }
+
+	public String getName() {
+		return name;
+	}
 }
