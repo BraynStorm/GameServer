@@ -18,5 +18,5 @@ public abstract class Spell {
     public abstract boolean canCast(Player source, EntityLiving target);
     public abstract boolean canCast(Player source, Vector3f traget);
     
-    public abstract void cast(EntityLiving src, EntityLiving target);
+    public abstract void cast(EntityLiving src, Object target);
 }

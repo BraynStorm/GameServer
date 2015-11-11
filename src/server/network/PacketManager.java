@@ -115,10 +115,6 @@ public class PacketManager {
             		break;
             	}
             	
-            	Spell
-            	
-            	//if(player.isInMotion())
-            		//rejectPacket(client);
             	
             	
             	break;
