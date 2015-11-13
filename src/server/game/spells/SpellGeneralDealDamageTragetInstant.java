@@ -1,5 +1,8 @@
 package server.game.spells;
 
+import java.util.List;
+
+import server.core.Main;
 import server.game.Damage;
 import server.game.DamageType;
 import server.game.entities.EntityLiving;
@@ -32,19 +35,12 @@ public abstract class SpellGeneralDealDamageTragetInstant extends Spell {
 
 	@Override
 	public void cast(EntityLiving src, Object target) {
-		
-		
 		if(target instanceof EntityLiving) {
-			target = (EntityLiving) target;
-		} else {
-			target = (Vector3f) target;
-		}
-		
-		
-		
-		float[] result = Damage.dealDamageTo(100f, DamageType.PHYSICAL, 0, target);
-		// TODO a lot of work on the 'log' left...
-		String.format("%s's hit %s for %3.2f(%s)(%3.2f).", src.getName(), id, target.getName(), result[0], DamageType.PHYSICAL.name(), result[1]);
+			//Entity
+			float[] result = Damage.dealDamageTo(100f, DamageType.PHYSICAL, 0, (EntityLiving) target);
+			
+			// TODO a lot of work on the 'log' left...
+			String.format("%s's hit %s for %3.2f(%s)(%3.2f).", src.getName(), id, target.getName(), result[0], DamageType.PHYSICAL.name(), result[1]);
+		}	
 	}
-
 }
