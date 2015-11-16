@@ -2,6 +2,7 @@ package server.game.entities;
 
 import com.google.common.eventbus.Subscribe;
 
+import braynstorm.commonlib.entities.Entity;
 import braynstorm.commonlib.math.Vector3f;
 import server.core.events.EntityTickEvent;
 

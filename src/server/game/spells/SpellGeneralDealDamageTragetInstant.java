@@ -7,7 +7,6 @@ import server.game.Damage;
 import server.game.DamageType;
 import server.game.entities.EntityLiving;
 import server.game.entities.Player;
-import braynstorm.commonlib.Logger;
 import braynstorm.commonlib.math.Vector3f;
 
 public abstract class SpellGeneralDealDamageTragetInstant extends Spell {
@@ -33,14 +32,27 @@ public abstract class SpellGeneralDealDamageTragetInstant extends Spell {
 		return false;
 	}
 
-	@Override
+	@Override // TODO Unknown if it works.
 	public void cast(EntityLiving src, Object target) {
+		Damage damage = new Damage(100f, DamageType.PHYSICAL, 0);
+		
 		if(target instanceof EntityLiving) {
 			//Entity
-			float[] result = Damage.dealDamageTo(100f, DamageType.PHYSICAL, 0, (EntityLiving) target);
+			EntityLiving targetEntity = (EntityLiving) target;
+			float[] result = damage.dealTo(targetEntity);
 			
-			// TODO a lot of work on the 'log' left...
-			String.format("%s's hit %s for %3.2f(%s)(%3.2f).", src.getName(), id, target.getName(), result[0], DamageType.PHYSICAL.name(), result[1]);
-		}	
+			String.format("%s's hit %s for %3.2f(%s)(%3.2f).", src.getName(), id, targetEntity.getName(), result[0], DamageType.PHYSICAL.name(), result[1]);
+		}else if (target instanceof Vector3f){
+			Vector3f targetArea = (Vector3f) target;
+			
+			List<EntityLiving> affectedEntities = Main.getWorld().getAllEntitiesInShape(new ShapeCircle(targetArea, 15f));
+			
+			affectedEntities.forEach(entity -> {
+				float[] result = damage.dealTo(entity);
+				
+				String.format("%s's hit %s for %3.2f(%s)(%3.2f).", src.getName(), id, entity.getName(), result[0], DamageType.PHYSICAL.name(), result[1]);
+			});
+			
+		}
 	}
 }

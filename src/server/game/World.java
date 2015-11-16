@@ -4,9 +4,9 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import braynstorm.commonlib.entities.Dirtyness;
 import braynstorm.commonlib.math.Vector3f;
 import server.core.Config;
-import server.game.entities.Dirtyness;
 import server.game.entities.EntityLiving;
 import server.game.entities.Player;
 import server.game.spells.Shape;
