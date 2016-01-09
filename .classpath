@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Guava"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/CommonLib"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JSON"/>
-	<classpathentry kind="lib" path="D:/Braynstorm/workspace/mysql-connector-java-5.1.18-bin.jar"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/CommonLib"/>
+	<classpathentry kind="lib" path="/CommonLib/lib/guava-18.0.jar" sourcepath="/CommonLib/lib/guava-18.0-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/CommonLib/lib/guava-18.0-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/CommonLib/lib/JSON.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.18-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

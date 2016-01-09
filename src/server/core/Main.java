@@ -1,6 +1,5 @@
 package server.core;
 
-
 import java.io.File;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -10,6 +9,7 @@ import server.core.db.Database;
 import server.game.World;
 import server.network.PacketManager;
 import server.network.Server;
+
 public class Main {
 	private static String mainDir = "";
 	private static String dataDir = "";
